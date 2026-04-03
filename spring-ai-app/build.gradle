@@ -11,8 +11,8 @@ dependencies {
 
     // For AI - Spring AI dependencies
     implementation platform("org.springframework.ai:spring-ai-bom:${springAiVersion}")
-    implementation 'org.springframework.ai:spring-ai-starter-model-anthropic'
-    implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
+    implementation 'org.springframework.ai:spring-ai-starter-model-openai-sdk'
+//    implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
     implementation 'org.springframework.ai:spring-ai-pgvector-store'
     runtimeOnly 'org.postgresql:postgresql'
 
@@ -31,9 +31,10 @@ dependencies {
     implementation 'com.google.code.gson:gson'
 
     // For Retrofit and OkHttp
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
     implementation 'com.squareup.retrofit2:retrofit:2.10.0'
     implementation 'com.squareup.retrofit2:converter-jackson:2.10.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.10.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.10.0'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.0'
 }
