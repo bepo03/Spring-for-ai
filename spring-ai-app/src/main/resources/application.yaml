@@ -15,6 +15,16 @@ spring:
       chat:
         options:
           model: ${OPENAI_MODEL}
+    ollama:
+      base-url: http://${OLLAMA_HOST}:${OLLAMA_PORT}
+      embedding:
+        options:
+          model: ${OLLAMA_EMBEDDING_MODEL}
+      chat:
+        options:
+          model: qwen2.5:3b
+          temperature: ${OLLAMA_TEMPERATURE}
+          num-predict: ${OLLAMA_NUM_PREDICT}
 
 logging:
   level:

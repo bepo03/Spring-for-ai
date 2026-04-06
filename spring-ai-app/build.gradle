@@ -11,8 +11,8 @@ dependencies {
 
     // For AI - Spring AI dependencies
     implementation platform("org.springframework.ai:spring-ai-bom:${springAiVersion}")
-    implementation 'org.springframework.ai:spring-ai-starter-model-openai-sdk'
-//    implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
+//    implementation 'org.springframework.ai:spring-ai-starter-model-openai-sdk'
+    implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
     implementation 'org.springframework.ai:spring-ai-pgvector-store'
     runtimeOnly 'org.postgresql:postgresql'
 
