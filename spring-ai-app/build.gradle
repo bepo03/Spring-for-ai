@@ -12,7 +12,7 @@ dependencies {
     implementation platform("org.springframework.ai:spring-ai-bom:${springAiVersion}")
 //    implementation 'org.springframework.ai:spring-ai-starter-model-openai-sdk'
     implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
-    implementation 'org.springframework.ai:spring-ai-pgvector-store'
+    implementation 'org.springframework.ai:spring-ai-starter-vector-store-pgvector'
     runtimeOnly 'org.postgresql:postgresql'
 
     // Micrometer (ObservationRegistry용) For OllamaChatModel

@@ -1,20 +1,40 @@
 server:
   port: ${SERVER_PORT}
+
 spring:
   config:
     import: optional:file:../.env[.properties]
+
   application:
     name: spring-ai-app
+
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   ai:
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimension: ${VECTOR_DIMENSION}
+
     openai-sdk:
       api-key: ${OPENAI_API_KEY}
       chat:
         options:
           model: ${OPENAI_MODEL}
+
     ollama:
       base-url: http://${OLLAMA_HOST}:${OLLAMA_PORT}
       embedding:
