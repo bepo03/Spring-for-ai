@@ -1,7 +1,7 @@
 package org.spring.ai.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.spring.ai.dto.ChatResponse;
+import org.spring.ai.dto.response.ChatResponse;
 import org.spring.ai.dto.TokenUsage;
 import org.spring.ai.global.custom.ContextLengthExceededException;
 import org.springframework.ai.chat.client.ChatClient;

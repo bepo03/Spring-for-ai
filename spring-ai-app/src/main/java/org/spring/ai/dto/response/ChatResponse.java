@@ -1,7 +1,8 @@
-package org.spring.ai.dto;
+package org.spring.ai.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import org.spring.ai.dto.TokenUsage;
 
 import java.time.LocalDateTime;
 
