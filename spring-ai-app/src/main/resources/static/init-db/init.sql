@@ -1,14 +1,14 @@
 -- ================================================
--- pgvector extension 활성화
--- ================================================
-CREATE EXTENSION IF NOT EXISTS vector;
-
--- ================================================
 -- vector_store 테이블 삭제
 -- ================================================
 DROP INDEX IF EXISTS idx_vector_store_embedding;
 DROP INDEX IF EXISTS idx_vector_store_metadata;
 DROP TABLE IF EXISTS vector_store;
+
+-- ================================================
+-- pgvector extension 활성화
+-- ================================================
+CREATE EXTENSION IF NOT EXISTS vector;
 
 -- ================================================
 -- vector_store 테이블 생성
@@ -18,16 +18,17 @@ CREATE TABLE IF NOT EXISTS vector_store
     id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     content    TEXT NOT NULL,
     metadata   JSONB,
-    embedding  vector(1536), -- dimensions 확인!
+    embedding  vector(768), -- dimensions 확인!
     created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ================================================
 -- 성능 최적화 인덱스
 -- ================================================
-CREATE INDEX idx_vector_store_embedding ON vector_store USING hnsw (embedding vector_cosine_ops);
+CREATE INDEX idx_vector_store_embedding ON vector_store USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
 
 CREATE INDEX IF NOT EXISTS idx_vector_store_metadata ON vector_store USING gin (metadata jsonb_path_ops);
+
 
 -- ================================================
 -- documents 테이블 생성

@@ -24,8 +24,7 @@ spring:
   ai:
     vectorstore:
       pgvector:
-        initialize-schema: true
-        index-type: HNSW
+        initialize-schema: false
         distance-type: COSINE_DISTANCE
         dimension: ${VECTOR_DIMENSION}
 
@@ -42,7 +41,7 @@ spring:
           model: ${OLLAMA_EMBEDDING_MODEL}
       chat:
         options:
-          model: qwen2.5:3b
+          model: ${OLLAMA_MODEL}
           temperature: ${OLLAMA_TEMPERATURE}
           num-predict: ${OLLAMA_NUM_PREDICT}
 
