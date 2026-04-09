@@ -111,6 +111,7 @@ public class RagController {
     /**
      * 유사도 점수와 함께 문서 검색 엔드포인트
      */
+    @GetMapping("/search-with-score")
     public ResponseEntity<SearchDocumentsResponse> searchWithScore(
             @RequestParam
             String query,
