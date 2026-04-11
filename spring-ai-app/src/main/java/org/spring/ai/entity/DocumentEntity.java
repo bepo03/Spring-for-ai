@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "documents")
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class DocumentEntity {
 
     @Id
-    private String id;
+    private UUID id;
 
     @Column(nullable = false)
     private String filename;

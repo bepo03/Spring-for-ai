@@ -25,10 +25,18 @@ CREATE TABLE IF NOT EXISTS vector_store
 -- ================================================
 -- 성능 최적화 인덱스
 -- ================================================
-CREATE INDEX idx_vector_store_embedding ON vector_store USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+-- CREATE INDEX idx_vector_store_embedding ON vector_store USING hnsw (embedding vector_cosine_ops);
 
 CREATE INDEX IF NOT EXISTS idx_vector_store_metadata ON vector_store USING gin (metadata jsonb_path_ops);
 
+-- ================================================
+-- documents 테이블 삭제
+-- ================================================
+DROP INDEX IF EXISTS idx_documents_type_date;
+DROP INDEX IF EXISTS idx_documents_content_type;
+DROP INDEX IF EXISTS idx_documents_uploaded_at;
+DROP INDEX IF EXISTS idx_documents_filename;
+DROP TABLE IF EXISTS documents;
 
 -- ================================================
 -- documents 테이블 생성
@@ -77,9 +85,9 @@ COMMENT ON COLUMN documents.metadata IS 'JSON 형태의 추가 메타데이터';
 -- ================================================
 -- 확인 메시지
 -- ================================================
-DO
-$$
-    BEGIN
-        RAISE NOTICE 'Vector store initialized successfully';
-    END
-$$;
+-- DO
+-- $$
+--     BEGIN
+--         RAISE NOTICE 'Vector store initialized successfully';
+--     END
+-- $$;

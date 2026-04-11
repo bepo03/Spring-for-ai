@@ -2,6 +2,8 @@ package org.spring.ai.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.spring.ai.dto.DocumentSource;
+import org.spring.ai.dto.response.RagResponse;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.document.Document;
@@ -83,7 +85,60 @@ public class RagService {
                 .call()
                 .content();
 
+        log.info("RAG 답변 생성 완료 (Advisor)");
         return answer;
+    }
+
+    public RagResponse askWithSource(String question) {
+        log.info("Rag 질문 (소스 포함): {}", question);
+
+        // 1. 관련 문서 검색
+        List<Document> relevantDocs = vectorStore.similaritySearch(
+                SearchRequest.builder()
+                        .query(question)
+                        .topK(5)
+                        .build()
+        );
+
+        if (relevantDocs.isEmpty()) {
+            return new RagResponse(
+                    "죄송하지만 관련 정보를 찾을 수 없습니다.",
+                    List.of()
+            );
+        }
+
+        // 2. Context 구성
+        String context = relevantDocs.stream()
+                .map(Document::getText)
+                .collect(Collectors.joining("\n\n---\n\n"));
+
+        String prompt = String.format("""
+                다음 문서들을 참고하여 질문에 답변해주세요.
+                
+                [참고 문서]
+                %s
+                
+                [질문]
+                %s
+                """, context, question);
+
+        // 3. 답변 생성
+        ChatClient chatClient = chatClientBuilder.build();
+        String answer = chatClient.prompt()
+                .user(prompt)
+                .call()
+                .content();
+
+        // 4. 소스 정보 추출
+        List<DocumentSource> sources = relevantDocs.stream()
+                .map(document -> new DocumentSource(
+                        (String) document.getMetadata().get("filename"),
+                        (String) document.getMetadata().get("document_id"),
+                        document.getText().substring(0, Math.min(200, document.getText().length()))
+                )).toList();
+
+        log.info("RAG 답변 생성 완료 (소스 포함)");
+        return new RagResponse(answer, sources);
     }
 
     /**

@@ -42,7 +42,7 @@ public class DocumentService {
 
         // 2. DB에 원본 문서 저장
         DocumentEntity documentEntity = DocumentEntity.builder()
-                .id(UUID.randomUUID().toString())
+                .id(UUID.randomUUID())
                 .filename(file.getOriginalFilename())
                 .content(content)
                 .contentType(file.getContentType())
@@ -66,7 +66,7 @@ public class DocumentService {
     /**
      * 문서 분할 (Chunking)
      */
-    private List<Document> splitDocument(String content, String documentId, String filename) {
+    private List<Document> splitDocument(String content, UUID documentId, String filename) {
         // TokenTextSplitter: 토큰 기반으로 문서 분할
         TextSplitter splitter = new TokenTextSplitter(
                 500, // defaultChunkSize: 기본 청크 크기
@@ -78,7 +78,7 @@ public class DocumentService {
 
         // 메타데이터 추가
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put("document_id", documentId);
+        metadata.put("document_id", documentId.toString());
         metadata.put("filename", filename);
         metadata.put("source", "user_upload");
 
@@ -92,7 +92,7 @@ public class DocumentService {
     /**
      * TextReader를 사용하여 문서 분할 (대안)
      */
-    private List<Document> splitDocumentWithReader(MultipartFile file, String documentId) throws IOException {
+    private List<Document> splitDocumentWithReader(MultipartFile file, UUID documentId) throws IOException {
         // ByteArrayResource로 변환
         Resource resource = new ByteArrayResource(file.getBytes()) {
             @Override
@@ -103,7 +103,7 @@ public class DocumentService {
 
         // TextReader 사용
         TextReader textReader = new TextReader(resource);
-        textReader.getCustomMetadata().put("document_id", documentId);
+        textReader.getCustomMetadata().put("document_id", documentId.toString());
         textReader.getCustomMetadata().put("filename", file.getOriginalFilename());
         textReader.getCustomMetadata().put("source", "user_upload");
 
@@ -123,7 +123,7 @@ public class DocumentService {
         log.info("텍스트 문서 추가: {}", filename);
 
         DocumentEntity documentEntity = DocumentEntity.builder()
-                .id(UUID.randomUUID().toString())
+                .id(UUID.randomUUID())
                 .filename(filename)
                 .content(content)
                 .contentType("text/plain")
@@ -152,11 +152,13 @@ public class DocumentService {
     public void deleteDocument(String documentId) {
         log.info("문서 삭제: {}", documentId);
 
+        UUID id = parseDocumentId(documentId);
+
         // DB에서 삭제
-        DocumentEntity documentEntity = documentRepository.findById(documentId)
+        documentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("문서를 찾을 수 없습니다: " + documentId));
 
-        documentRepository.deleteById(documentId);
+        documentRepository.deleteById(id);
 
         // 벡터 저장소에서 해당 문서의 청크도 삭제하는 로직
         try {
@@ -168,7 +170,7 @@ public class DocumentService {
                             .topK(1000)
                             .build()
                     ).stream()
-                    .map(document -> document.getId())
+                    .map(Document::getId)
                     .toList();
 
             if (!documentIds.isEmpty()) {
@@ -192,5 +194,16 @@ public class DocumentService {
                         .topK(topK)
                         .build()
         );
+    }
+
+    /**
+     * 요청으로 받은 문서 ID 문자열을 Repository 조회용 UUID로 변환
+     */
+    private UUID parseDocumentId(String documentId) {
+        try {
+            return UUID.fromString(documentId);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("잘못된 문서 ID 형식입니다." + documentId);
+        }
     }
 }

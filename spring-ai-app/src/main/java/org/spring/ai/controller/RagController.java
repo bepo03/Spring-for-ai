@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.spring.ai.dto.DocumentInfo;
 import org.spring.ai.dto.request.QuestionRequest;
 import org.spring.ai.dto.response.AnswerResponse;
+import org.spring.ai.dto.response.RagResponse;
 import org.spring.ai.dto.response.SearchDocumentsResponse;
 import org.spring.ai.service.RagService;
 import org.springframework.ai.document.Document;
@@ -66,6 +67,29 @@ public class RagController {
                     .body(new AnswerResponse(
                             "죄송합니다. Advisor 질문 처리 중 오류가 발생했습니다." + e.getMessage(),
                             "error"));
+        }
+    }
+
+    /**
+     * 소스 정보를 포함한 RAG 응답
+     */
+    @PostMapping("/ask-with-source")
+    public ResponseEntity<RagResponse> askWithSource(
+            @RequestBody
+            QuestionRequest request
+    ) {
+        try {
+            log.info("RAG 질문 요청 (소스 포함): {}", request.question());
+
+            RagResponse response = ragService.askWithSource(request.question());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("RAG 질문 처리 실패 (소스 포함): {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new RagResponse(
+                            "죄송합니다. 소스 포함 질문 처리 중 오류가 발생했습니다." + e.getMessage(),
+                            List.of()));
         }
     }
 
